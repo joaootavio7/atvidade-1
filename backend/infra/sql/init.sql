@@ -1,20 +1,27 @@
-BEFORE INSERT ON Aluno
-FOR EACH ROW EXECUTE FUNCTION gerar_ra();
 
+CREATE SEQUENCE seq_ra START 1;
 
-CREATE TABLE Livro (
-    id_livro INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    titulo VARCHAR (200) NOT NULL,
-    autor VARCHAR (150) NOT NULL,
-    editora VARCHAR (100) NOT NULL,
-    ano_publicacao VARCHAR (5),
-    isbn VARCHAR (20),
-    quant_total INTEGER NOT NULL,
-    quant_disponivel INTEGER NOT NULL,
-    valor_aquisicao DECIMAL (10,2),
-    status_livro_emprestado VARCHAR (20)
+CREATE TABLE Aluno (
+    id_aluno INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ra VARCHAR (7) UNIQUE NOT NULL,
+    nome VARCHAR (80) NOT NULL,
+    sobrenome VARCHAR (80) NOT NULL,
+    data_nascimento DATE,
+    endereco VARCHAR (200),
+    email VARCHAR (80),
+    celular VARCHAR (20) NOT NULL
 );
 
+CREATE OR REPLACE FUNCTION gerar_ra() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.ra := 'AAA' || TO_CHAR(nextval('seq_ra'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_ra
+BEFORE INSERT ON Aluno
+FOR EACH ROW EXECUTE FUNCTION gerar_ra();
 
 CREATE TABLE Emprestimo (
     id_emprestimo INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
